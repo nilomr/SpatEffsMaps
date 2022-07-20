@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/license-MIT-green)
 
 And we want maps!
-![](/reports/figures/laydate_estimate_se.png)
+![](/reports/figures/sample_maps.png)
 
 ### Project Organization
 
