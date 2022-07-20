@@ -1,13 +1,10 @@
-
-# Oh my lordy lord, there's spatial structure everywhere
+## Oh my lordy lord, there's spatial structure everywhere
 ![](https://img.shields.io/badge/-R_Markdown-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)
 ![](https://img.shields.io/badge/license-MIT-green)
-
 
 And we want maps!
 
 ![](/reports/figures/laydate_estimate_se.png)
-
 
 ### Project Organization
 
@@ -39,7 +36,6 @@ And we want maps!
     │   ├── compute.R
     │   ├── dirs.R
         └── plot.R
-
 
 
 <br>
