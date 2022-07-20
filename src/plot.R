@@ -1,3 +1,15 @@
+# DESCRIPTION ──────────────────────────────────────────────────────────────── #
+
+# Functions and variable definitions related to project structure and directory
+# management.
+
+# DEPENDENCIES ─────────────────────────────────────────────────────────────── #
+
+box::use(magrittr[`%>%`])
+box::use(. / compute[dec_places, log10_floor])
+
+# FUNCTIONS ────────────────────────────────────────────────────────────────── #
+
 #' Expands a spatial dataframe along one axis by duplicating edge values
 #'
 #' @param df A tibble with columns ('x', 'y', 'estimate', 'se')
@@ -82,19 +94,20 @@ settheme <- function(text.size = 8, text.colour = "#262626",
                      back.fill = "#f0f0f0") {
     return(
         ggplot2::theme(
-            text = element_text(size = text.size),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.border = element_rect(
+            text = ggplot2::element_text(size = text.size),
+            panel.grid.major = ggplot2::element_blank(),
+            panel.grid.minor = ggplot2::element_blank(),
+            panel.border = ggplot2::element_rect(
                 colour = text.colour,
                 fill = NA, size = 1
             ),
-            panel.background = element_rect(fill = back.fill, color = NA),
-            axis.ticks.y = element_blank(),
-            axis.ticks.x = element_blank(),
-            axis.text.x = element_text(colour = text.colour),
-            axis.text.y = element_text(colour = text.colour),
-            plot.title = element_text(
+            panel.background =
+                ggplot2::element_rect(fill = back.fill, color = NA),
+            axis.ticks.y = ggplot2::element_blank(),
+            axis.ticks.x = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_text(colour = text.colour),
+            axis.text.y = ggplot2::element_text(colour = text.colour),
+            plot.title = ggplot2::element_text(
                 size = text.size + 6, face = "bold",
                 colour = text.colour
             ),
@@ -102,15 +115,20 @@ settheme <- function(text.size = 8, text.colour = "#262626",
             plot.subtitle = ggtext::element_markdown(
                 size = text.size, colour = text.colour
             ),
-            plot.caption = element_text(size = 8, hjust = 0),
+            plot.caption = ggplot2::element_text(size = 8, hjust = 0),
             plot.caption.position = "plot",
-            plot.background = element_rect(fill = back.fill, color = NA),
+            plot.background =
+                ggplot2::element_rect(fill = back.fill, color = NA),
             legend.key.width = ggplot2::unit(0.5, "cm"),
             legend.position = c(.9, .75),
-            legend.background = element_rect(fill = "transparent", color = NA),
-            legend.box.background = element_rect(fill = "transparent", color = NA),
-            legend.text = element_text(color = text.colour, size = text.size),
-            legend.title = element_text(color = text.colour, size = text.size - 1)
+            legend.background =
+                ggplot2::element_rect(fill = "transparent", color = NA),
+            legend.box.background =
+                ggplot2::element_rect(fill = "transparent", color = NA),
+            legend.text =
+                ggplot2::element_text(color = text.colour, size = text.size),
+            legend.title =
+                ggplot2::element_text(color = text.colour, size = text.size - 1)
         )
     )
 }

@@ -3,6 +3,10 @@
 # Functions and variable definitions related to project structure and directory
 # management.
 
+# DEPENDENCIES ─────────────────────────────────────────────────────────────── #
+
+box::use(magrittr[`%>%`])
+
 # FUNCTIONS ────────────────────────────────────────────────────────────────── #
 
 #' Returns a tibble with conditional effects of spatial predictors.
