@@ -1,8 +1,8 @@
 # Dependencies
 ```{r}
 box::use(src / dirs[dirs])
-box::use(src / compute[log10_floor, dec_places, spat_condeffs])
-box::use(src / plot[settheme, plot_ticks, expand_rast, ])
+box::use(compute = src / compute)
+box::use(plt = src / plot)
 box::use(readr[read_csv])
 box::use(brms[...])
 box::use(magrittr[`%>%`])
@@ -17,8 +17,6 @@ box::use(patchwork[...])
 
 ```{r}
 
-ggplot(data = nestbox_df, aes(x = x, y = y, colour = northness)) +
-    geom_point()
 # Nestbox information
 nestbox_df <- read_csv(file.path(dirs$resources, "nestbox_data.csv")) %>%
     janitor::clean_names()
@@ -34,7 +32,7 @@ perimeter <- terra::vect(file.path(
 ))
 terra::crs(perimeter) <- "epsg:27700"
 
-# *This only goes up to 2013, don't ask me why
+# *This only goes up to 2016, don't ask me why
 ```
 
 
@@ -51,7 +49,7 @@ terra::crs(perimeter) <- "epsg:27700"
 # if you have a lot more data, fit a spline-based smooth
 # [e.g., s(x,y, by=year)] instead
 
-# Spatial distribution of lay dates (1 year only)
+# Spatial distribution of lay dates (2 year only)
 m_0_f <- brms::brmsformula(
     laydate ~ 1 + year + gp(x, y, k = 20, scale = TRUE, c = 5 / 4),
     family = gaussian()
@@ -68,9 +66,9 @@ m_1_f <- brms::brmsformula(
 
 ```{r}
 m_0 <-
-    brm(
+    brms::brm(
         formula = m_0_f,
-        data = breeding_df %>% filter(year == 2011),
+        data = breeding_df %>% dplyr::filter(year > 2014),
         # prior = priors,
         iter = 2000, warmup = 500,
         chains = 4,
@@ -80,16 +78,17 @@ m_0 <-
         file = file.path(dirs$model_fits, "m_0"),
         file_refit = "on_change",
         backend = "cmdstanr",
-        # comment out the 'backend' arg. if you don't
-        # want to install cmdstanr (sampling will be slower)
+        # Comment out the 'backend' arg. if you don't
+        # want to install cmdstanr (sampling will be slower).
+        # To install: https://mc-stan.org/cmdstanr/
         control = list(
-            adapt_delta = 0.9,
-            max_treedepth = 10
+            adapt_delta = 0.99,
+            max_treedepth = 15
         )
     )
 
 m_1 <-
-    brm(
+    brms::brm(
         formula = m_1_f,
         data = nestbox_df,
         # prior = priors,
@@ -101,8 +100,6 @@ m_1 <-
         file = file.path(dirs$model_fits, "m_1"),
         file_refit = "on_change",
         backend = "cmdstanr",
-        # comment out the 'backend' arg. if you don't
-        # want to install cmdstanr (sampling will be slower)
         control = list(
             adapt_delta = 0.9,
             max_treedepth = 10
@@ -130,7 +127,7 @@ psetts <- list(
 # 1. Extract conditional effects
 # Build and tweak your plot with low resolution (<100),
 # then increase before you export the final version (~500)
-m_0_df <- spat_condeffs(
+m_0_df <- compute$spat_condeffs(
     m_0,
     varnames = "x:y",
     resolution = 500,
@@ -138,7 +135,7 @@ m_0_df <- spat_condeffs(
 )
 
 # 2. Expand and mask
-m_0_expdf <- expand_rast(m_0_df)
+m_0_expdf <- plt$expand_rast(m_0_df)
 
 masked_rast <- terra::rast(m_0_expdf, type = "xyz") %>%
     terra::mask(., perimeter) %>%
@@ -163,11 +160,10 @@ ggplot2::ggplot() +
         size = 0.5,
         colour = psetts$text.colour
     ) +
-    scale_size_continuous(range = c(0.5, 5)) +
     scale_fill_distiller(
-        palette = "RdBu",
+        palette = "Spectral",
         name = ("Estimate\n(april day)\n"),
-        breaks = plot_ticks(plot_type, masked_rast, 5),
+        breaks = plt$plot_ticks(plot_type, masked_rast, 5),
         direction = 1,
         guide = guide_colorbar(
             ticks = FALSE,
@@ -176,7 +172,7 @@ ggplot2::ggplot() +
             nbin = 1000
         )
     ) +
-    settheme(
+    plt$settheme(
         text.size = psetts$text.size,
         text.colour = psetts$text.colour,
         back.fill = psetts$background.colour
@@ -204,11 +200,10 @@ ggplot2::ggplot() +
         size = 0.5,
         colour = psetts$text.colour
     ) +
-    scale_size_continuous(range = c(0.5, 5)) +
     scale_fill_distiller(
-        palette = "RdBu",
+        palette = "Spectral",
         name = ("Standard error\nof estimate\n"),
-        breaks = plot_ticks(plot_type, masked_rast, 5),
+        breaks = plt$plot_ticks(plot_type, masked_rast, 5),
         direction = -1,
         guide = guide_colorbar(
             ticks = FALSE,
@@ -217,7 +212,7 @@ ggplot2::ggplot() +
             nbin = 1000
         )
     ) +
-    settheme(
+    plt$settheme(
         text.size = psetts$text.size,
         text.colour = psetts$text.colour,
         back.fill = psetts$background.colour
@@ -240,19 +235,22 @@ laydate_estimate_se <- (laydate_estimate + laydate_se) &
         axis.ticks.x = element_blank(),
         axis.title.y = element_blank(),
         axis.text.y = element_blank(),
-        axis.ticks.y = element_blank()
+        axis.ticks.y = element_blank(),
+        plot.margin = unit(c(.8, .8, .8, .8), "cm"),
+        plot.background =
+            ggplot2::element_rect(fill = psetts$background.colour),
     )
 ggsave(
     filename = "laydate_estimate_se.png",
     plot = laydate_estimate_se,
     path = dirs$figs,
     scale = 1,
-    width = 26,
-    height = 13,
+    width = 30,
+    height = 22,
     units = "cm",
     dpi = 350,
     limitsize = FALSE,
-    bg = "transparent"
+    bg = psetts$background.colour
 )
 ```
 
@@ -265,15 +263,15 @@ ggsave(
 # 1. Extract conditional effects
 # Build and tweak your plot with low resolution (<100),
 # then increase before you export the final version (~500)
-m_1_df <- spat_condeffs(
+m_1_df <- compute$spat_condeffs(
     m_1,
     varnames = "x:y",
-    resolution = 300,
+    resolution = 500,
     ndraws = 500
 )
 
 # 2. Expand and mask
-m_1_expdf <- expand_rast(m_1_df)
+m_1_expdf <- plt$expand_rast(m_1_df)
 
 masked_rast <- terra::rast(m_1_expdf, type = "xyz") %>%
     terra::mask(., perimeter) %>%
@@ -297,13 +295,11 @@ ggplot2::ggplot() +
         size = 0.3,
         colour = psetts$text.colour
     ) +
-    scale_size_continuous(range = c(0.5, 5)) +
-    scale_fill_viridis_c(
-        option = "inferno",
-        alpha = 1,
-        direction = -1,
+    colorspace::scale_fill_continuous_sequential(
+        palette = "Mako",
+        rev = F,
         name = "Northness",
-        breaks = plot_ticks(plot_type, masked_rast, 5),
+        breaks = plt$plot_ticks(plot_type, masked_rast, 5),
         guide = guide_colorbar(
             ticks = FALSE,
             frame.colour = psetts$text.colour,
@@ -311,7 +307,7 @@ ggplot2::ggplot() +
             nbin = 1000
         )
     ) +
-    settheme(
+    plt$settheme(
         text.size = psetts$text.size,
         text.colour = psetts$text.colour,
         back.fill = psetts$background.colour
@@ -337,7 +333,7 @@ ggsave(
     units = "cm",
     dpi = 350,
     limitsize = FALSE,
-    bg = "transparent"
+    bg = psetts$background.colour
 )
 ```
 
