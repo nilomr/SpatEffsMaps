@@ -225,36 +225,6 @@ ggplot2::ggplot() +
     ) -> laydate_se
 ```
 
-### Combine and save
-```{r}
-
-laydate_estimate_se <- (laydate_estimate + laydate_se) &
-    theme(
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        plot.margin = unit(c(.8, .8, .8, .8), "cm"),
-        plot.background =
-            ggplot2::element_rect(fill = psetts$background.colour),
-    )
-ggsave(
-    filename = "laydate_estimate_se.png",
-    plot = laydate_estimate_se,
-    path = dirs$figs,
-    scale = 1,
-    width = 30,
-    height = 22,
-    units = "cm",
-    dpi = 350,
-    limitsize = FALSE,
-    bg = psetts$background.colour
-)
-```
-
-
 ## Plot: northness
 
 ### Get estimates from fitted model
@@ -320,25 +290,38 @@ ggplot2::ggplot() +
     ) -> northness
 ```
 
-### Save
+### Combine and save
 ```{r}
 
+laydate_estimate_se <- (laydate_estimate + laydate_se + northness) &
+    theme(
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = unit(c(.8, .8, .8, .8), "cm"),
+        plot.background =
+            ggplot2::element_rect(fill = psetts$background.colour),
+    )
 ggsave(
-    filename = "northness.png",
-    plot = northness,
+    filename = "sample_maps.png",
+    plot = laydate_estimate_se,
     path = dirs$figs,
     scale = 1,
-    width = 13,
-    height = 13,
+    width = 43,
+    height = 16,
     units = "cm",
     dpi = 350,
     limitsize = FALSE,
-    bg = psetts$background.colour
+    bg = "transparent"
 )
 ```
 
+
 ```{r}
-# Add points to any of the plots above the usual way:
+# Add box locations to any of the plots above the usual way:
 geom_point(
     data = nestbox_df, aes(
         x = x, y = y
