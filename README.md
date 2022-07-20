@@ -1,5 +1,5 @@
 
-# OMG everything varies spatially
+# Oh my lordy lord, there's spatial structure everywhere
 ![](https://img.shields.io/badge/-R_Markdown-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)
 ![](https://img.shields.io/badge/license-MIT-green)
 
@@ -47,17 +47,16 @@ And we want maps!
 ### To use this repository:
 
 1. Navigate to the folder where you want to install the repository. Then type
-   `git clone https://github.com/nilomr/tit-winter-movement.git`
+   `git clone https://github.com/nilomr/carys-maps.git`
 
-2. Open the `winter-movement.Rproj` file. The `renv` package, used for
+2. Open the `maps.Rproj` file. The `renv` package, used for
    dependency management, will be automatically installed if it isn't already.
 
 3. In your R console, type `renv::restore(lockfile = "renv.lock")`. This will
    install **the project's R dependencies**\
 — you might still need to manually fix some unresolved system dependencies.
 
-4. Open and run the `0.1_data_ingest.Rmd` notebook first. This will prepare the
-   data for the rest of the analyses.
+1. Open and run the `main.Rmd` notebook.
 
 <br>
 
