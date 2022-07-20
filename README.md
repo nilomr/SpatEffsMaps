@@ -3,7 +3,6 @@
 ![](https://img.shields.io/badge/license-MIT-green)
 
 And we want maps!
-
 ![](/reports/figures/laydate_estimate_se.png)
 
 ### Project Organization
@@ -63,4 +62,4 @@ The project is licensed under the [MIT license](./LICENSE).
 
 --------
 
-<p><small>2022 | Nilo Merino Recalde | based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>.</small></p>
+<p><small>2022 | Nilo M. Recalde</small></p>
