@@ -95,7 +95,6 @@ pykanto/data/datasets
 !pykanto/data/segmented/great_tit
 pykanto/data/segmented/*
 /logs/
-/data
 
 # Pytorch/neptune
 */.neptune
