@@ -42,7 +42,7 @@ And we want maps!
 ### To use this repository:
 
 1. Navigate to the folder where you want to install the repository. Then type
-   `git clone https://github.com/nilomr/carys-maps.git`
+   `git clone https://github.com/nilomr/SpatEffsMaps.git`
 
 2. Open the `maps.Rproj` file. The `renv` package, used for
    dependency management, will be automatically installed if it isn't already.
