@@ -12,19 +12,19 @@ box::use(terra)
 box::use(sf)
 box::use(ggtext)
 box::use(patchwork[...])
-box::use(rayshader)
+box::use(rayshader[...])
 
 
 # ──── IMPORT DATA ────────────────────────────────────────────────────────────
 
 
 # Nestbox information
-nestbox_df <- read_csv(file.path(config$path$resources, "nestbox_data.csv")) %>%
+nestbox_df <- read_csv(file.path(config$path$resources, "nestbox_data.csv")) |>
     janitor::clean_names()
 
 # Breeding data*
-breeding_df <- read_csv(file.path(config$path$data, "breeding_data.csv")) %>%
-    dplyr::mutate(box = toupper(box)) %>%
+breeding_df <- read_csv(file.path(config$path$data, "breeding_data.csv")) |>
+    dplyr::mutate(box = toupper(box)) |>
     dplyr::left_join(nestbox_df, by = "box")
 
 
@@ -36,73 +36,76 @@ pop_contour <- terra::vect(
 pop_contour_sf <- pop_contour |> sf::st_as_sf()
 
 
+# Load elevation raster
+elevation <- raster::raster(
+    file.path(config$path$resources, "elevation_map", "10m_DTM_2022_wytham_wider.tif")
+) |>
+    terra::rast() |>
+    terra::project("EPSG:27700")
+
+
+# resample to 20m
+elevation <- terra::aggregate(elevation, 2, fun = mean)
+
+# ──── LOAD 2D RASTERS (VARIABLES TO PLOT) ────────────────────────────────────
+
+
+# Load elevation raster
+laydates <- raster::raster(
+    file.path(config$path$resources, "2d_maps", "nsm1_rast.tif")
+) |>
+    terra::rast()
+
+terra::crs(laydates) <- terra::crs(elevation)
+
+# set laydates to the same extent as elevation
+laydates <- terra::resample(laydates, elevation, method = "bilinear")
+laydates_matrix <- raster_to_matrix(laydates)
+
+# create a 2d RGB array with a color palette of the same size as the elevation raster.
+overlay_template = array(0, dim = c(nrow(elevation), ncol(elevation), 4))
+
+# map the elevation raster to a color palette
 
 
 
 
-# ──── MODELS ─────────────────────────────────────────────────────────────────
+# # Resample to 5m
+# elevation <- terra::disagg(elevation, 4, method = "bilinear")
 
-## Formulae
 
-# I'll use default priors since this is just a minimal example
+# ──── SIMPLE 3D PLOT W/ RAYSHADER ────────────────────────────────────────────
 
-# For info on approximate gaussian process, choice of basis functions, etc,
-# see https://arxiv.org/abs/2004.11408
 
-# if you have a lot more data, fit a spline-based smooth
-# [e.g., s(x,y, by=year)] instead
+# And convert it to a matrix:
+elmat <- raster_to_matrix(elevation)
 
-# Spatial distribution of lay dates (2 year only)
-m_0_f <- brms::brmsformula(
-    laydate ~ 1 + year + s(x, y),
-    family = gaussian()
+
+# We use another one of rayshader's built-in textures:
+elmat |>
+    sphere_shade(texture = "desert") |>
+    add_shadow(ray_shade(elmat, zscale = 4), 0.8) |>
+    add_shadow(ambient_shade(elmat), 0) |>
+    add_overlay(generate_altitude_overlay(elmat, laydates_matrix, 100, 400))
+plot_3d(
+    elmat,
+    zscale = 5,
+    baseshape = "circle",
+    fov = 10,
+    theta = 0,
+    zoom = 0.5,
+    phi = 40,
+    windowsize = c(1500, 700),
+    shadow = FALSE,
+    solid = FALSE,
+    soliddepth = 0
 )
+Sys.sleep(0.2)
 
-
-# ──── FIT MODELS ─────────────────────────────────────────────────────────────
-
-m_0_data <- breeding_df |>
-    dplyr::filter(year > 2014) |>
-    dplyr::filter(!is.na(x) & !is.na(y)) |>
-    # select where species == g
-    dplyr::filter(species == "g")
-
-m_0 <-
-    brms::brm(
-        formula = m_0_f,
-        data = m_0_data,
-        # prior = priors,
-        iter = 1000,
-        warmup = 300,
-        chains = 4,
-        cores = parallel::detectCores(),
-        seed = 444,
-        threads = brms::threading(2),
-        sample_prior = FALSE,
-        file = file.path(config$path$fits, "m_0"),
-        file_refit = "on_change",
-        backend = "cmdstanr"
-    )
-
-
-# ──── EXTRACT SPATIAL PREDICTIONS ────────────────────────────────────────────
-
-# Settings
-resolution <- 20
-ndraws <- 1000
-year <- 2022
-type <- "estimate" # or "se" if you want standard errors instead
-
-# Get marginal predictions from the model across a spatial grid
-m_0_preds <- get_spatial_preds(m_0, m_0_data, resolution, ndraws)
-
-# Now build a raster from the predictions
-nsm1_rast <- get_raster(
-    m_0_preds, pop_contour,
-    year = NULL, type, resolution,
-    fact = 4
+render_snapshot(
+    filename = file.path(config$path$figures, "3d_map.png"),
+    clear = TRUE
 )
-# This nsm1_rast object is a tibble with columns x, y, and the estimate.
 
 
 # ──── PLOT MAP ───────────────────────────────────────────────────────────────
