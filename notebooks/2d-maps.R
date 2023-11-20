@@ -103,6 +103,7 @@ nsm1_rast <- get_raster(
     fact = 4
 )
 # This nsm1_rast object is a tibble with columns x, y, and the estimate.
+    nsm1_rast |> terra::rast(),
 
 
 # ──── PLOT MAP ───────────────────────────────────────────────────────────────
