@@ -103,7 +103,11 @@ nsm1_rast <- get_raster(
     fact = 4
 )
 # This nsm1_rast object is a tibble with columns x, y, and the estimate.
+# Save the raster as a .tif file
+terra::writeRaster(
     nsm1_rast |> terra::rast(),
+    file.path(config$path$resources, "2d_maps", "nsm1_rast.tif")
+)
 
 
 # ──── PLOT MAP ───────────────────────────────────────────────────────────────
