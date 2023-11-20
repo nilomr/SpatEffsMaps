@@ -32,7 +32,7 @@ breeding_df <- read_csv(file.path(config$path$data, "breeding_data.csv")) %>%
 pop_contour <- terra::vect(
     file.path(config$path$resources, "wytham_map", "perimeter.shp")
 ) |>
-    terra::project("+init=epsg:27700")
+    terra::project("EPSG:27700")
 pop_contour_sf <- pop_contour |> sf::st_as_sf()
 
 
