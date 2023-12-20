@@ -294,3 +294,71 @@ get_raster <- function(preds, pop_contour, year = NULL, type = "estimate",
 
     return(mrast)
 }
+
+#' @title Resample elevation raster to a new resolution
+#'
+#' This function resamples the elevation raster to a new resolution using either
+#' aggregation or disaggregation based on the factor between the current and new
+#' resolution.
+#'
+#' @param elevation The elevation raster to be resampled.
+#' @param new_res The desired new resolution in meters.
+#'
+#' @return The resampled elevation raster.
+#'
+#' @examples
+#' elevation <- resample_elevation(elevation, 5)
+#'
+#' @export
+resample_elevation <- function(elevation, new_res) {
+    current_res <- terra::yres(elevation) # (m)
+    factor <- new_res / current_res
+
+    if (factor > 1) {
+        # if larger, aggregate
+        elevation <- terra::aggregate(elevation, factor, fun = mean)
+    } else {
+        # if smaller, disaggregate
+        disagg_factor <- 1 / factor
+        elevation <- terra::disagg(elevation, disagg_factor, method = "bilinear")
+    }
+
+    return(elevation)
+}
+
+
+#' Function to interpolate data to a raster
+#'
+#' This function takes a data frame with x, y, and z columns and interpolates
+#' the data to a raster grid.
+#'
+#' @param data_df The input data frame containing x, y, and z columns.
+#' @param z_col The name of the column in data_df that contains the z values.
+#' @param resolution The resolution of the output raster grid (number of cells
+#'   in x and y directions). Assumes square pixels. Should be an integer.
+#' @param crs The coordinate reference system (CRS) of the output raster.
+#'
+#' @return A raster object representing the interpolated data.
+#'
+#' @export
+interpolate_to_raster <- function(data_df, z_col, resolution, crs) {
+    interpolated_df <- interp::interp(
+        x = data_df[["x"]],
+        y = data_df[["y"]],
+        z = data_df[[z_col]],
+        duplicate = "mean",
+        nx = resolution,
+        ny = resolution
+    ) |>
+        interp::interp2xyz() |>
+        as.data.frame() |>
+        stats::setNames(c("x", "y", "z"))
+
+    raster <- terra::rast(
+        interpolated_df,
+        type = "xyz",
+        crs = crs
+    )
+
+    return(raster)
+}
