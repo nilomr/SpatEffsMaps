@@ -132,3 +132,100 @@ settheme <- function(text.size = 8, text.colour = "#262626",
         )
     )
 }
+
+
+#' Generate Color Bar Plot
+#'
+#' This function generates a color bar plot based on a raster and a palette.
+#'
+#' @param raster The raster object.
+#' @param palette The color palette.
+#' @param title The title of the color bar plot.
+#'
+#' @return A color bar plot.
+#'
+#' @examples
+#' # Generate color bar plot for a raster using a palette
+#' raster <- raster::raster("path/to/raster.tif")
+#' palette <- colorRampPalette(c("blue", "red"))(200)
+#' generate_color_bar_plot(raster, palette, "Title")
+#'
+#' @import ggplot2
+#' @importFrom raster values
+#' @importFrom dplyr as.integer
+#' @importFrom dplyr unique
+#' @importFrom dplyr sort
+#' @importFrom stats min
+#' @importFrom stats max
+generate_color_bar_plot <- function(raster, palette, title) {
+    # Extract unique values from the raster
+    raster_values <- raster::values(raster, na.rm = TRUE) |>
+        as.integer() |>
+        unique() |>
+        sort()
+
+    # Create a vector with 200 values in the range
+    raster_range <- seq(min(raster_values), max(raster_values), length.out = length(palette))
+
+    # Build a data frame with the values and the corresponding colors from the palette
+    raster_df <- data.frame(
+        value = raster_range,
+        color = palette
+    )
+
+    # Generate the color bar plot
+    color_bar_plot <- ggplot2::ggplot(raster_df, ggplot2::aes(x = value, y = 1)) +
+        ggplot2::geom_raster(ggplot2::aes(fill = color)) +
+        ggplot2::scale_fill_identity() +
+        ggplot2::coord_flip() +
+        ggplot2::scale_x_continuous(
+            breaks = seq(min(raster_values), max(raster_values), length.out = 3),
+            labels = seq(min(raster_values), max(raster_values), length.out = 3)
+        ) +
+        # add a title
+        ggplot2::labs(
+            title = title
+        ) +
+        ggplot2::theme(
+            aspect.ratio = 10 / 1,
+            # no axis titles
+            axis.title.x = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_blank(),
+            # remove y axis ticks and labels
+            axis.text.x = ggplot2::element_blank(),
+            axis.ticks.x = ggplot2::element_blank(),
+            #  remove any background
+            panel.background = ggplot2::element_blank(),
+            panel.border = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+    return(color_bar_plot)
+}
+
+#' Set Alpha Layer in a RGB Array
+#'
+#' This function sets the alpha layer in the rgb array based on the values
+#' in the previous three layers.
+#'
+#' @param rgbarray The rgbarray array with dimensions 261 x 312 x 4.
+#' @param opacity The opacity value to set for the alpha layer.
+#' @return The modified rgbarray array with the alpha layer updated.
+#' @examples
+#' rgbarray <- set_alpha_layer(rgbarray, 0.6)
+set_alpha_layer <- function(rgbarray, opacity) {
+    h <- dim(rgbarray)[1]
+    w <- dim(rgbarray)[2]
+    rgbarray <- array(c(rgbarray, rep(1, h * w)), dim = c(h, w, 4))
+    # Iterate over each pixel in the rgbarray array
+    for (i in 1:dim(rgbarray)[1]) {
+        for (j in 1:dim(rgbarray)[2]) {
+            # Check if the values in the previous three layers are all 1
+            if (rgbarray[i, j, 1] == 1 & rgbarray[i, j, 2] == 1 &
+                rgbarray[i, j, 3] == 1) {
+                # Set the opacity value in the alpha layer
+                rgbarray[i, j, 4] <- opacity
+            }
+        }
+    }
+    return(rgbarray)
+}
