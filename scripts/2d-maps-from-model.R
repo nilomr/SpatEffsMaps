@@ -1,11 +1,11 @@
 # ──── DEPENDENCIES ───────────────────────────────────────────────────────────
+
 config <- config::get()
 box::use(compute = src / compute)
 box::use(src / utils[get_spatial_preds, get_raster])
 box::use(plt = src / plot)
 box::use(readr[read_csv])
 box::use(brms[...])
-box::use(magrittr[`%>%`])
 box::use(ggplot2[...])
 box::use(dplyr)
 box::use(terra)
@@ -17,16 +17,36 @@ box::use(patchwork[...])
 # ──── IMPORT DATA ────────────────────────────────────────────────────────────
 
 
-
 # Nestbox information
-nestbox_df <- read_csv(file.path(config$path$resources, "nestbox_data.csv")) %>%
+nestbox_df <- read_csv(file.path(config$path$resources, "nestbox_data.csv")) |>
     janitor::clean_names()
 
 # Breeding data*
-breeding_df <- read_csv(file.path(config$path$data, "breeding_data.csv")) %>%
-    dplyr::mutate(box = toupper(box)) %>%
+breeding_df <- read_csv(file.path(config$path$data, "breeding_data.csv")) |>
+    dplyr::mutate(box = toupper(box)) |>
     dplyr::left_join(nestbox_df, by = "box")
 
+# Laydates
+laydates_df <- breeding_df |>
+    dplyr::filter(year > 2014) |>
+    dplyr::filter(!is.na(x) & !is.na(y)) |>
+    dplyr::filter(species == "g")
+
+# Oak data
+oak_df <- read_csv(file.path(config$path$resources, "oak_data.csv")) |>
+    janitor::clean_names()
+
+# (add density of oak trees within 75m)
+oak_density <-
+    oak_df |>
+    dplyr::mutate(
+        n_oak = purrr::map2_dbl(
+            x, y,
+            ~ sum(
+                (oak_df$x - .x)^2 + (oak_df$y - .y)^2 < 75^2
+            )
+        )
+    )
 
 # Load perimeter shapefile
 pop_contour <- terra::vect(
@@ -34,10 +54,6 @@ pop_contour <- terra::vect(
 ) |>
     terra::project("EPSG:27700")
 pop_contour_sf <- pop_contour |> sf::st_as_sf()
-
-
-
-
 
 
 # ──── MODELS ─────────────────────────────────────────────────────────────────
@@ -58,20 +74,20 @@ m_0_f <- brms::brmsformula(
     family = gaussian()
 )
 
+# Spatial distribution of oak tree density
+m_1_f <- brms::brmsformula(
+    n_oak ~ 1 + s(x, y, k = 100, bs = "tp"),
+    family = gaussian()
+)
+
 
 # ──── FIT MODELS ─────────────────────────────────────────────────────────────
 
-m_0_data <- breeding_df |>
-    dplyr::filter(year > 2014) |>
-    dplyr::filter(!is.na(x) & !is.na(y)) |>
-    # select where species == g
-    dplyr::filter(species == "g")
 
 m_0 <-
     brms::brm(
         formula = m_0_f,
-        data = m_0_data,
-        # prior = priors,
+        data = laydates_df,
         iter = 1000,
         warmup = 300,
         chains = 4,
@@ -84,8 +100,25 @@ m_0 <-
         backend = "cmdstanr"
     )
 
+m_1 <-
+    brms::brm(
+        formula = m_1_f,
+        data = oak_density,
+        iter = 1000,
+        warmup = 300,
+        chains = 4,
+        cores = parallel::detectCores(),
+        seed = 444,
+        threads = brms::threading(2),
+        sample_prior = FALSE,
+        file = file.path(config$path$fits, "m_1"),
+        file_refit = "on_change",
+        backend = "cmdstanr"
+    )
 
-# ──── EXTRACT SPATIAL PREDICTIONS ────────────────────────────────────────────
+
+
+# ──── EXTRACT SPATIAL PREDICTIONS FROM THE MODELS ────────────────────────────
 
 # Settings
 resolution <- 20
@@ -93,24 +126,38 @@ ndraws <- 1000
 year <- 2022
 type <- "estimate" # or "se" if you want standard errors instead
 
-# Get marginal predictions from the model across a spatial grid
-m_0_preds <- get_spatial_preds(m_0, m_0_data, resolution, ndraws)
+models <- list(m_0, m_1)
+model_data <- list(laydates_df, oak_density)
+model_names <- c("m_0", "m_1")
 
-# Now build a raster from the predictions
-nsm1_rast <- get_raster(
-    m_0_preds, pop_contour,
-    year = NULL, type, resolution,
-    fact = 4
-)
-# This nsm1_rast object is a tibble with columns x, y, and the estimate.
-# Save the raster as a .tif file
-terra::writeRaster(
-    nsm1_rast |> terra::rast(),
-    file.path(config$path$resources, "2d_maps", "nsm1_rast.tif")
-)
+for (i in seq_along(models)) {
+    # Get marginal predictions from the model across a spatial grid
+    preds <- get_spatial_preds(
+        models[[i]], model_data[[i]],
+        resolution, ndraws
+    )
 
+    # Now build a raster from the predictions
+    rast <- get_raster(
+        preds, pop_contour,
+        year = NULL, type, resolution,
+        fact = 4
+    )
+
+    # Save the raster as a .tif file
+    terra::writeRaster(
+        rast |> terra::rast(),
+        file.path(
+            config$path$resources, "2d_maps",
+            paste0(model_names[i], "_rast.tif")
+        ),
+        overwrite = TRUE
+    )
+}
 
 # ──── PLOT MAP ───────────────────────────────────────────────────────────────
+
+# This is just a minimal example, you can customise the plot as you wish
 
 # Plot settings
 psetts <- list(
@@ -123,7 +170,7 @@ psetts <- list(
 
 m_0_plot <- ggplot2::ggplot() +
     ggplot2::geom_raster(
-        data = nsm1_rast, aes(x = x, y = y, fill = !!sym(type))
+        data = rast, aes(x = x, y = y, fill = !!sym(type))
     ) +
     ggplot2::geom_sf(
         data = sf::st_as_sf(pop_contour), fill = NA,
@@ -140,7 +187,7 @@ m_0_plot <- ggplot2::ggplot() +
     scale_fill_distiller(
         palette = "Spectral",
         name = ("Estimate\n(april day)\n"),
-        breaks = plt$plot_ticks(type, nsm1_rast, 5),
+        breaks = plt$plot_ticks(type, rast, 5),
         direction = 1,
         guide = guide_colorbar(
             ticks = FALSE,
