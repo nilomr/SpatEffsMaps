@@ -65,6 +65,9 @@ raster_files <- list.files(file.path(config$path$resources, "2d_maps"),
 names(raster_files) <- c("laydates", "oaks")
 
 # Define palettes for each raster
+
+oak_palette <- rev(colorRampPalette(MetBrewer::met.brewer("Demuth"))(200))
+
 palettes <- list(
     laydates = c(
         "#992e16", "#bb5743", "#be764c", "#C08E39",
