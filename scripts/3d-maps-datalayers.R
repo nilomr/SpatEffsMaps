@@ -32,8 +32,16 @@ elevation <- raster::raster(
     terra::project("EPSG:27700") |>
     terra::crop(raster::extent(445000, 448700, 206500, 209180))
 
+# Import great tit box locations:
+box_coords <- read_csv(file.path(
+    config$path$resources,
+    "nestbox_data.csv"
+))
+
+
+
 # Resample to 5m resolution
-elevation <- resample_elevation(elevation, 20) # 4m resolution for final render
+elevation <- resample_elevation(elevation, 10) # 4m resolution for final render
 
 res <- terra::yres(elevation) # spatial resolution (assumes square pixels)
 hc <- 4 # height exaggeration factor
@@ -66,14 +74,15 @@ names(raster_files) <- c("laydates", "oaks")
 
 # Define palettes for each raster
 
-oak_palette <- rev(colorRampPalette(MetBrewer::met.brewer("Demuth"))(200))
+# oak_palette <- rev(colorRampPalette(MetBrewer::met.brewer("VanGogh3"))(200))
+oak_palette <- scico::scico(n = 200, palette = "lipari")
 
 palettes <- list(
     laydates = c(
         "#992e16", "#bb5743", "#be764c", "#C08E39",
         "#565C33", "#184948", "#022A2A"
     ),
-    oaks = c("#f2f2f2", "#613c27")
+    oaks = oak_palette
 )
 
 # Create an empty list to store the height maps
@@ -167,8 +176,94 @@ for (file in names(raster_files)) {
             soliddepth = 0.01
         )
 
+    render_points(
+        extent = extent, lat = box_coords$y, long = box_coords$x,
+        offset = 0, zscale = res / hc, color = "black", heightmap = elmat_masked
+    )
+
     render_snapshot(
-        filename = file.path(config$path$figures, paste0(file, "_datalayer.svg")),
+        filename = file.path(config$path$figures, paste0(file, "_datalayer.png")),
         clear = TRUE
     )
 }
+
+
+# ──── HELLO THIS IS A TEST ───────────────────────────────────────────────────
+
+
+# Load the raster
+file <- "laydates"
+raster <- raster::raster(raster_files[[file]]) |> terra::rast()
+
+# Set the CRS to match elevation_masked
+terra::crs(raster) <- terra::crs(elevation_masked)
+
+# Resample the raster to match elevation_masked
+raster <- terra::resample(raster, elevation_masked, method = "bilinear")
+
+# Convert the raster to a matrix
+raster_matrix <- raster_to_matrix(raster, verbose = FALSE)
+
+# Generate the height map using a color palette
+palette <- colorRampPalette("white")(1000)
+height_map <- height_shade(raster_matrix, texture = palette)
+
+
+
+elmat_masked %>%
+    sphere_shade(texture = "bw") |>
+    # add_overlay(
+    #     overlay = height_map
+    # ) |>
+    add_shadow(lamb_shade(elmat_masked, zscale = 6), 0) |>
+    add_shadow(
+        ray_shade(
+            elmat_masked,
+            sunaltitude = 20,
+            sunangle = -20,
+            zscale = res / hc,
+            multicore = TRUE
+        ),
+        max_darken = 0.02
+    ) |>
+    add_shadow(
+        ambient_shade(
+            elmat_masked,
+            zscale = res / hc,
+        ), 0.01
+    ) |>
+    add_overlay(
+        overlay = height_map,
+        alphalayer = 0.9,
+    ) |>
+    add_overlay(
+        generate_line_overlay(
+            pop_contour_ls, # using pop_contour_sf instead == solid area
+            extent,
+            heightmap = elmat_masked,
+            linewidth = 4
+        )
+    ) |>
+    plot_3d(
+        elmat_masked,
+        zscale = res / hc,
+        baseshape = "rectangle",
+        fov = 10,
+        theta = 10,
+        zoom = 0.55,
+        phi = 30,
+        windowsize = c(5200, 3000),
+        shadow = FALSE,
+        solid = FALSE,
+        soliddepth = 0.01
+    )
+
+render_points(
+    extent = extent, lat = box_coords$y, long = box_coords$x,
+    size = 4, color = "#ff0000a4",
+    offset = 5, zscale = (res / hc) * 0.9, heightmap = elmat_masked
+)
+render_snapshot(
+    filename = file.path(config$path$figures, paste0("boxes_datalayer.png")),
+    clear = TRUE, point_radius = 5
+)
