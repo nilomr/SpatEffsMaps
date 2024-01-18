@@ -51,7 +51,7 @@ pop_contour <- terra::vect(
 pop_contour_sf <- pop_contour |> sf::st_as_sf()
 
 # Define crs
-crs = terra::crs(pop_contour)
+crs <- terra::crs(pop_contour)
 
 
 # ──── INTERPOLATE DATA TO A RASTER ───────────────────────────────────────────
@@ -60,12 +60,12 @@ std_laydates <-
     breeding_df |>
     dplyr::filter(!is.na(x) & !is.na(y) & !is.na(laydate)) |>
     dplyr::filter(species == "g") |>
+    dplyr::filter(year > 1959) |>
     dplyr::group_by(year) |>
     dplyr::mutate(
         laydate = laydate - mean(laydate)
     ) |>
     dplyr::ungroup()
-
 
 
 # Oak tree density
@@ -95,7 +95,6 @@ for (i in names(rasters)) {
         overwrite = TRUE
     )
 }
-
 
 
 # Plot the interpolated data
