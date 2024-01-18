@@ -75,6 +75,16 @@
         "lattice"
       ]
     },
+    "MetBrewer": {
+      "Package": "MetBrewer",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9dda8af6359c4b3932426430c38fa1b1",
+      "Requirements": [
+        "ggplot2"
+      ]
+    },
     "R.cache": {
       "Package": "R.cache",
       "Version": "0.15.0",
@@ -541,6 +551,14 @@
         "Rcpp"
       ]
     },
+    "deldir": {
+      "Package": "deldir",
+      "Version": "2.0-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9cde0014710c25657467a326b68db622",
+      "Requirements": []
+    },
     "desc": {
       "Package": "desc",
       "Version": "1.4.1",
@@ -927,6 +945,18 @@
       "Repository": "CRAN",
       "Hash": "cc21c0957774c1602ec3324a5a47d798",
       "Requirements": []
+    },
+    "interp": {
+      "Package": "interp",
+      "Version": "1.1-5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "509ba3b3e62d16a7d3a365f5e858d66b",
+      "Requirements": [
+        "Rcpp",
+        "RcppEigen",
+        "deldir"
+      ]
     },
     "isoband": {
       "Package": "isoband",
@@ -1749,6 +1779,16 @@
         "munsell",
         "rlang",
         "viridisLite"
+      ]
+    },
+    "scico": {
+      "Package": "scico",
+      "Version": "1.5.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "742a3472a1d45462e66f75dc510f24f6",
+      "Requirements": [
+        "scales"
       ]
     },
     "sf": {
