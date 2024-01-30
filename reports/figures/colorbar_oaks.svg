@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='144.00pt' height='360.00pt' viewBox='0 0 144.00 360.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwxNDQuMDB8MC4wMHwzNjAuMDA='>
+    <rect x='0.00' y='0.00' width='144.00' height='360.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxNDQuMDB8MC4wMHwzNjAuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAuNjR8MTAzLjM2fDAuMDB8MzYwLjAw'>
+    <rect x='40.64' y='0.00' width='62.72' height='360.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAuNjR8MTAzLjM2fDAuMDB8MzYwLjAw)'>
+<rect x='40.64' y='0.00' width='62.72' height='360.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<g clip-path='url(#cpMC4wMHwxNDQuMDB8MC4wMHwzNjAuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpNjUuMDN8OTcuODh8MjMuMzJ8MzUxLjc4'>
+    <rect x='65.03' y='23.32' width='32.85' height='328.46' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNjUuMDN8OTcuODh8MjMuMzJ8MzUxLjc4)'>
+<image width='29.86' height='298.60' x='66.53' y='38.25' preserveAspectRatio='none' image-rendering='pixelated' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAPoCAYAAADJE047AAAEmklEQVR4nO2d2w0kOQzEeg6df36bx/4eeqMwCzDJBArSlEtqz+v3/98/3zPg/b6J7vPfRPUxVrxr9TNq9fs8K+GN7q5i3znOXBiZixMeFZy5OHyLgHDn8iVXY5GihR4U1pnLl1ztXBRDc9lWH2HFwoXeFiA+cymXPZmrSy6MkosT7mmRoi0Tw1exMblWwqPgErpauVdPdI1jsYWeorGI4au4sYhRct0vbDSXbcv0DQmfuYTJlbk44ZILwmcuYXLpWu2ruFZjNBYxfGNx6eqNcObC6PNcGL6KE8bwmavkwvCNxXYuDN9x8kXmruKfzVzDz3MJWy2rOGGMzIXha7Wv4oQxMheGr9VdRSR8DN9xqtUYvquIhDEyF4YwuXQV+25vW+gTvk+45MLwbSCZC0M4FjNXwqfIXAkfQ7kIbIR9FZdcCR8jcyV8jMYiKGz7LcUiM+H7hH3m8gVI5kr4PuHZstfOhdGQSPg+Yd9Y7DhhKM0lq7hWY5RcGJkLQ2iu1V9N+1rtEx7+NGlXERA+c/nOsU9YeZw2wkJzDf88bKL7vF9jEaKxmPAxfE+LvgDxjUVfq33CPnPNstoXmT5zJYzRzoWRuTB8rfYJ+8zlq7hWY7yjgp3maqFP+AzG5Nq977Sh5Er4PmFfcrXsYWQujMyF4XuNMxeGL7l8wu/3/CbCJRfGMrlk5mpIYMw+9Gs010i443S/sNFctp0rc2H4zLVb6Iffd5IJl1wYVXy/sK/VVcwJP6MNpLF4v7Cv1V1FYCjNJXtazFwYvoq79cHwmauK7xf2JZdPuKzG8FXc02LCxyi5MHwV+1qdMEbJhVHFGL6KE8YoMjGU5tpQxfcLz5KrT6JidI4xfBX7ksvXap+w7xx3nDCU5tqQuTCq+H7hhkTCx3i/n+wqosjE6LM+CR/DZy5fgLRzYWQuDF+rfRWXXAnfJ+w7x76KazVGWY3hM1fCGD5z+Sr23dBnrvuFfZeoCWP4frup5MKo1Qkf4x0Fl7LVtjuQkivhY2QuDF+rfVmduTB8FSeM0T0Xhu8cNxYTPobv7Z+SC6OxmPAxMlfCx/BldcIYvp3Ld5z6GemE7xNu50r4GN1zYfiGhK/ihDEyF4av1b6POSeM4TtOtRrDV3HCGD0tYvjOcebC8F0pvt/o30p85vIJ99UyDONYtGV1whi+ncsYICPhIjPh+4SNx2kkbDSX7T81+xdRDN8diO819iVX5rpf2NdqX8W+5FruXBtpn6urGKPkwshc9wu/n21INBYxSi6MkgsUnsjmapDMhWGs2Gaudi6MmbkKkPuFfcmVqzGMyWV7Ps5cGMusrtUMTaf7hY3mslVcqzF6hMEQmuuxrT6ZC6PkwhCaq+SiEJprl1y1GkJ4jlffactcGLOx6JvHQnOtLsqNrbZV3FjE8JmrsYjhM9cyuWSt9plrmFy6VmcuTnj15fZZxTpzJYzhM5dwOu2+kmJrtW8e+1zte42FO5fOXD5Xt3NhLJ+dJroll0DY12pjxbrpVHJdL+xrtW/nylwYPnM1FkFhm7l8r3FZjVHFnLBuLJZcGL5zXKsxfBX7vhnia/U/rtXHiuZ9+/UAAAAASUVORK5CYII='/>
+</g>
+<g clip-path='url(#cpMC4wMHwxNDQuMDB8MC4wMHwzNjAuMDA=)'>
+<text x='60.10' y='339.91' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";' textLength='5.59px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='60.10' y='190.76' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";' textLength='13.98px' lengthAdjust='spacingAndGlyphs'>2.5</text>
+<text x='60.10' y='41.61' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";' textLength='5.59px' lengthAdjust='spacingAndGlyphs'>5</text>
+<polyline points='62.29,336.70 65.03,336.70 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='62.29,187.55 65.03,187.55 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='62.29,38.40 65.03,38.40 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='65.03' y='15.10' style='font-size: 13.20px; font-family: "Liberation Sans";' textLength='30.66px' lengthAdjust='spacingAndGlyphs'>oaks</text>
+</g>
+</svg>
