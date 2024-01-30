@@ -40,8 +40,8 @@ box_coords <- read_csv(file.path(
 
 
 
-# Resample to 5m resolution
-elevation <- resample_elevation(elevation, 10) # 4m resolution for final render
+# Resample to increase resolution
+elevation <- resample_elevation(elevation, 2) # 4m resolution for final render
 
 res <- terra::yres(elevation) # spatial resolution (assumes square pixels)
 hc <- 4 # height exaggeration factor
@@ -84,6 +84,8 @@ palettes <- list(
     ),
     oaks = oak_palette
 )
+
+#──── PLOT LAY DATES AND OAKS ────────────────────────────────────────────────
 
 # Create an empty list to store the height maps
 height_maps <- list()
@@ -156,7 +158,7 @@ for (file in names(raster_files)) {
         ) |>
         add_overlay(
             generate_line_overlay(
-                pop_contour_ls, # using pop_contour_sf instead == solid area
+                pop_contour_ls,
                 extent,
                 heightmap = elmat_masked,
                 linewidth = 4
@@ -176,11 +178,6 @@ for (file in names(raster_files)) {
             soliddepth = 0.01
         )
 
-    render_points(
-        extent = extent, lat = box_coords$y, long = box_coords$x,
-        offset = 0, zscale = res / hc, color = "black", heightmap = elmat_masked
-    )
-
     render_snapshot(
         filename = file.path(config$path$figures, paste0(file, "_datalayer.png")),
         clear = TRUE
@@ -188,8 +185,7 @@ for (file in names(raster_files)) {
 }
 
 
-# ──── HELLO THIS IS A TEST ───────────────────────────────────────────────────
-
+#──── PLOT NESTBOX LOCATIONS ─────────────────────────────────────────────────
 
 # Load the raster
 file <- "laydates"
@@ -210,11 +206,8 @@ height_map <- height_shade(raster_matrix, texture = palette)
 
 
 
-elmat_masked %>%
+elmat_masked  |>
     sphere_shade(texture = "bw") |>
-    # add_overlay(
-    #     overlay = height_map
-    # ) |>
     add_shadow(lamb_shade(elmat_masked, zscale = 6), 0) |>
     add_shadow(
         ray_shade(
@@ -260,10 +253,10 @@ elmat_masked %>%
 
 render_points(
     extent = extent, lat = box_coords$y, long = box_coords$x,
-    size = 4, color = "#ff0000a4",
+    size = 1.5, color = "#fa0707",
     offset = 5, zscale = (res / hc) * 0.9, heightmap = elmat_masked
 )
 render_snapshot(
     filename = file.path(config$path$figures, paste0("boxes_datalayer.png")),
-    clear = TRUE, point_radius = 5
+    clear = TRUE, point_radius = 5, software_renderer = TRUE
 )
